@@ -3,8 +3,9 @@ const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 const app = require('express')();
 const commandHandler = require('./commands/commands');
+const messageProvider = require('./lib/messages-provider');
 
-client.once('ready', () => console.log("da bot is login"));
+client.once('ready', () => console.log("da bot is logged in"));
 
 client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return;
@@ -16,11 +17,9 @@ client.login(process.env.BOT_TOKEN);
 
 app.use(require('body-parser').urlencoded({ extended: false }));
 
-app.post('/', (req, res) => {
-    if (req.body.key !== 'secret') return res.send('not authorized');
-    client.channels.cache.get('962275276337864706').send(req.body.message);
-    res.send('done');
-});
+for (const handler of messageProvider) {
+    app.post(handler.route, handler.handler(client));
+}
 
 app.listen(1111, () => {
     console.log('ready for listening message');
