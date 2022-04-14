@@ -1,7 +1,7 @@
 {
   "name": "bbbot-discord",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Discord Bot exclusively for BBB Server",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
     "dev": "nodemon src/bot"
   },
   "keywords": [],
-  "author": "",
+  "author": "Gala Paradi",
   "license": "ISC",
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
