@@ -2,7 +2,7 @@ require('dotenv').config();
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 const app = require('express')();
-const commandHandler = require('./commands/commands');
+const commandHandler = require('./lib/commands-provider');
 const messageProvider = require('./lib/messages-provider');
 
 client.once('ready', () => console.log("da bot is logged in"));

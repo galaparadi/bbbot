@@ -1,13 +1,16 @@
 require('dotenv').config();
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const fs = require('node:fs');
+const path = require('path');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 
-const commands = [
-    new SlashCommandBuilder().setName('hi').setDescription('Say hi to the bot. expect the bot response'),
-    new SlashCommandBuilder().setName('emas').setDescription('Ketahui harga emas hari ini'),
-]
-    .map(command => command.toJSON());
+const commands = fs
+    .readdirSync(path.join(__dirname, '..', '/commands'))
+    .map(location => {
+        let { commandBuilder } = require(path.join(__dirname, '..', '/commands', location));
+        // commandHandler[command] = handler;
+        return commandBuilder.toJSON();
+    });
 
 const rest = new REST({ version: '9' }).setToken(process.env.BOT_TOKEN);
 rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), { body: commands })
