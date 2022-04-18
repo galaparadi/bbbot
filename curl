@@ -1,1 +1,0 @@
-curl -X POST -d "message=hallo guys&key=secret" http://localhost:1111
