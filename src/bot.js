@@ -21,6 +21,6 @@ for (const handler of messageProvider) {
     app.post(handler.route, handler.handler(client));
 }
 
-app.listen(1111, () => {
+app.listen(process.env.MESSAGE_PORT || 1111, () => {
     console.log('ready for listening message');
 });
