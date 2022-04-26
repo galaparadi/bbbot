@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/bot",
-    "dev": "nodemon src/bot"
+    "dev": "nodemon src/bot",
+    "deploy-cmd": "node src/helper/deploy-command"
   },
   "keywords": [],
   "author": "Gala Paradi",

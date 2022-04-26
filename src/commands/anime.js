@@ -1,18 +1,42 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const axios = require('axios').default;
-const cheerio = require('cheerio');
+const { MessageEmbed } = require('discord.js');
+const { hyperlink } = require('@discordjs/builders');
+const { anime } = require('../datasource/anime')
 
 const command = 'anime';
 const handler = async (interaction) => {
     try {
-        // let htmlData = (await axios.get('https://pluang.com/widgets/price-graph/desktop-vertical')).data;
-        // let harga = cheerio.load(htmlData)('#gold-price').text().replace(/\D/g, '');
+        const option = interaction.options.data[0] || { value: { name: false } };
+        if (option.name === 'q') {
+            await interaction.deferReply();
+            const { title, description, posterHref, streams } = await anime(option.value);
+            const watchStream = streams.reduce((acc, curr) => {
+                acc = acc + `${hyperlink(curr.name, curr.href)} \n`;
+                return acc;
+            },'');
+            const embed = new MessageEmbed()
+                .setColor('#209cee')
+                .setTitle(title)
+                .addField('Description', description)
+                .addField('Watch Legal', watchStream, true)
+                .addField('Watch Ilegal', `comming soon`, true)
+                .setImage(posterHref)
+            await interaction.editReply({ content: title, ephermal: true });
+            return interaction.channel.send({ embeds: [embed] });
+        }
         await interaction.reply(`tunggu ya... layanan belum siap`);
     } catch (err) {
         console.log(err.message);
-        await interaction.reply(`Error geting harga emas`);
+        if (interaction.deferred) return await interaction.editReply(`error command, please report to the administrator`);
+        await interaction.reply(`error command, please report to the administrator`);
     }
 };
-const commandBuilder = new SlashCommandBuilder().setName(command).setDescription('update anime harianmu');
+
+const commandBuilder = new SlashCommandBuilder()
+    .setName(command)
+    .setDescription('update anime harianmu')
+    .addStringOption(option =>
+        option.setName('q').setDescription('query anime').setRequired(false)
+    );
 
 module.exports = { command, handler, commandBuilder }
