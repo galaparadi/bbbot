@@ -1,6 +1,6 @@
 {
   "name": "bbbot-discord",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Discord Bot exclusively for BBB Server",
   "main": "index.js",
   "scripts": {
