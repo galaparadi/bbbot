@@ -4,6 +4,7 @@ const channel = require('../enum/discord-channel');
 const { hyperlink } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { animeById } = require('../datasource/anime');
+const normalize = require('../utils/text-ellipsis');
 
 const route = '/anime';
 const handler = function (client) {
@@ -19,8 +20,8 @@ const handler = function (client) {
             .setColor('#209cee')
             .setTitle('NOW PLAYING!!, [Anime Notif]')
             .setDescription(title)
-            .addField('Description', description)
-            .addField('Watch Legal', watchStream, true)
+            .addField('Description', normalize(description) || 'no description')
+            .addField('Watch Legal', watchStream || 'no video provider', true)
             .addField('Watch Ilegal', `comming soon`, true)
             .setImage(posterHref)
         client.channels.cache.get(channel.ANIME).send({ embeds: [embed] })
