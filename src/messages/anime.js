@@ -3,14 +3,14 @@ const cheerio = require('cheerio');
 const channel = require('../enum/discord-channel');
 const { hyperlink } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
-const { anime } = require('../datasource/anime');
+const { animeById } = require('../datasource/anime');
 
 const route = '/anime';
 const handler = function (client) {
     return async function (req, res) {
         if (req.body.key !== 'secret') return;
-        if (!req.body.q) return res.send('query not exist');
-        const { title, description, posterHref, streams } = await anime(req.body.q);
+        if (!req.body.animeId) return res.send('query not exist');
+        const { title, description, posterHref, streams } = await animeById(req.body.animeId);
         const watchStream = streams.reduce((acc, curr) => {
             acc = acc + `${hyperlink(curr.name, curr.href)} \n`;
             return acc;
