@@ -17,8 +17,8 @@ const handler = async (interaction) => {
             const embed = new MessageEmbed()
                 .setColor('#209cee')
                 .setTitle(title)
-                .addField('Description', description)
-                .addField('Watch Legal', watchStream, true)
+                .addField('Description', description || 'no description')
+                .addField('Watch Legal', watchStream || 'no video provider', true)
                 .addField('Watch Ilegal', `comming soon`, true)
                 .setImage(posterHref)
             await interaction.editReply({ content: title, ephermal: true });
