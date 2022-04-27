@@ -9,6 +9,7 @@ const route = '/anime';
 const handler = function (client) {
     return async function (req, res) {
         if (req.body.key !== 'secret') return;
+        if (!req.body.q) return res.send('query not exist');
         const { title, description, posterHref, streams } = await anime(req.body.q);
         const watchStream = streams.reduce((acc, curr) => {
             acc = acc + `${hyperlink(curr.name, curr.href)} \n`;
@@ -22,7 +23,7 @@ const handler = function (client) {
             .addField('Watch Legal', watchStream, true)
             .addField('Watch Ilegal', `comming soon`, true)
             .setImage(posterHref)
-        client.channels.cache.get(channel.BOT_TEST).send({ embeds: [embed] })
+        client.channels.cache.get(channel.ANIME).send({ embeds: [embed] })
         res.send("done");
     }
 }
