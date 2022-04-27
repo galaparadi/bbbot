@@ -1,7 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
-const { anime } = require('../datasource/anime')
+const { anime } = require('../datasource/anime');
+const normalize = require('../utils/text-ellipsis');
 
 const command = 'anime';
 const handler = async (interaction) => {
@@ -17,7 +18,7 @@ const handler = async (interaction) => {
             const embed = new MessageEmbed()
                 .setColor('#209cee')
                 .setTitle(title)
-                .addField('Description', description || 'no description')
+                .addField('Description', normalize(description) || 'no description')
                 .addField('Watch Legal', watchStream || 'no video provider', true)
                 .addField('Watch Ilegal', `comming soon`, true)
                 .setImage(posterHref)
