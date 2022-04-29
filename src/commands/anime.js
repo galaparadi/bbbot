@@ -3,6 +3,7 @@ const { MessageEmbed } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
 const { anime } = require('../datasource/anime');
 const normalize = require('../utils/text-ellipsis');
+const logger = require('../logger/logger');
 
 const command = 'anime';
 const handler = async (interaction) => {
@@ -27,9 +28,10 @@ const handler = async (interaction) => {
         }
         await interaction.reply(`tunggu ya... layanan belum siap`);
     } catch (err) {
-        console.log(err.message);
+        // console.log(err.message);
         if (interaction.deferred) return await interaction.editReply(`error command, please report to the administrator`);
         await interaction.reply(`error command, please report to the administrator`);
+        logger.error(err);
     }
 };
 

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const axios = require('axios').default;
 const cheerio = require('cheerio');
+const logger = require('../logger/logger');
 
 const command = 'emas';
 const handler = async (interaction) => {
@@ -9,8 +10,9 @@ const handler = async (interaction) => {
         let harga = cheerio.load(htmlData)('#gold-price').text().replace(/\D/g, '');
         await interaction.reply(`Harga emas hari ini : ${harga}`);
     } catch (err) {
-        console.log(err.message);
+        // console.log(err.message);
         await interaction.reply(`Error geting harga emas`);
+        logger.error(err);
     }
 };
 const commandBuilder = new SlashCommandBuilder().setName(command).setDescription('ketahui harga emas hari ini');
