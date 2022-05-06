@@ -2,7 +2,7 @@ const axios = require('axios').default;
 const cheerio = require('cheerio');
 
 const anime = async (query) => {
-    const searchRes = await axios.get(`https://livechart.me/search?q=${query}`);
+    const searchRes = await axios.get(`https://livechart.me/search?q=${query}`, { headers: { "Cookie": "preferences=%7B%22time_zone%22%3A%22Asia%2FJakarta%22%7D;" } });
     const $search = cheerio.load(searchRes.data);
     const linkAnime = $search('.anime-list > li:nth-child(1) a').attr('href');
     const animeRes = await axios.get(`https://livechart.me${linkAnime}`);
