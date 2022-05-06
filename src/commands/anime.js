@@ -29,9 +29,9 @@ const handler = async (interaction) => {
         await interaction.reply(`tunggu ya... layanan belum siap`);
     } catch (err) {
         // console.log(err.message);
+        logger.error(err);
         if (interaction.deferred) return await interaction.editReply(`error command, please report to the administrator`);
         await interaction.reply(`error command, please report to the administrator`);
-        logger.error(err);
     }
 };
 
