@@ -1,5 +1,3 @@
-const axios = require('axios').default;
-const cheerio = require('cheerio');
 const channel = require('../enum/discord-channel');
 const { hyperlink } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');

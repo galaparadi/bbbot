@@ -13,7 +13,9 @@ const commandHandler = require('./lib/commands-provider');
 const messageProvider = require('./lib/messages-provider');
 const rpcProvider = require('./lib/rpc-provider')({ client });
 
-client.once('ready', () => console.log("da bot is logged in"));
+client.once('ready', () => {
+    console.log("da bot is logged in")
+});
 
 client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return;
@@ -37,6 +39,7 @@ for (const handler of messageProvider) {
 for (const rpc of rpcProvider) {
     app.post(`/rpc${rpc.routerPath}`, jayson.server(rpc.functions).middleware());
 }
+
 app.listen(process.env.MESSAGE_PORT || 1111, () => {
     console.log('ready for listening message');
 });
