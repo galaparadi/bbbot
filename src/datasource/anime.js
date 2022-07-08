@@ -15,6 +15,7 @@ const anime = async (query) => {
     const streams = $anime('#streams-list > li a').map(
         (i, elem) => { return { href: elem.attribs.href, name: elem.parent.attribs.title } }
     ).toArray();
+    
     return { posterHref, title, description, airing, currentEpisode, streams }
 }
 
