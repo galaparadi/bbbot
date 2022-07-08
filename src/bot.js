@@ -11,6 +11,7 @@ const client = new Client({
 const app = require('express')();
 const commandHandler = require('./lib/commands-provider');
 const messageProvider = require('./lib/messages-provider');
+const rpcProvider = require('./lib/rpc-provider')({ client });
 
 client.once('ready', () => console.log("da bot is logged in"));
 
@@ -25,11 +26,17 @@ client.login(process.env.BOT_TOKEN).then(() => {
 });
 
 app.use(require('body-parser').urlencoded({ extended: false }));
+app.use(require('body-parser').json());
+
+const jayson = require('jayson');
 
 for (const handler of messageProvider) {
     app.post(handler.route, handler.handler(client));
 }
 
+for (const rpc of rpcProvider) {
+    app.post(`/rpc${rpc.routerPath}`, jayson.server(rpc.functions).middleware());
+}
 app.listen(process.env.MESSAGE_PORT || 1111, () => {
     console.log('ready for listening message');
 });
