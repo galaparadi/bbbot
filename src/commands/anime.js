@@ -4,6 +4,13 @@ const { hyperlink } = require('@discordjs/builders');
 const { anime } = require('../datasource/anime');
 const normalize = require('../utils/text-ellipsis');
 const logger = require('../logger/logger');
+const EMOTE_NUMBER = {
+    1: '1️⃣',
+    2: '2️⃣',
+    3: '3️⃣',
+    4: '4️⃣',
+    5: '5️⃣',
+}
 
 const command = 'anime';
 const handler = async (interaction) => {
@@ -11,20 +18,34 @@ const handler = async (interaction) => {
         const option = interaction.options.data[0] || { value: { name: false } };
         if (option.name === 'q') {
             await interaction.deferReply();
-            const { title, description, posterHref, streams } = await anime(option.value);
-            const watchStream = streams.reduce((acc, curr) => {
-                acc = acc + `${hyperlink(curr.name, curr.href)} \n`;
-                return acc;
-            },'');
+            for await (const [key, val] of Object.entries(EMOTE_NUMBER)) {
+                await message.react(val);
+            }
+
+            const reactionFilter = (reaction, user) => {
+                return user.id === interaction.user.id;
+            };
+
+            message.awaitReactions({ filter: reactionFilter, max: 1, time: 10000, errors: ['time'] }).then(async collected => {
+                const selectedEmoji = collected.first().emoji.name;
+                let index = '0';
+                for (const [key, val] of Object.entries(EMOTE_NUMBER)) {
+                    if (val === selectedEmoji) index = key;
+                }
+                const { title, description, posterHref } = await animeById(animes[index - 1].id);
             const embed = new MessageEmbed()
                 .setColor('#209cee')
                 .setTitle(title)
                 .addField('Description', normalize(description) || 'no description')
-                .addField('Watch Legal', watchStream || 'no video provider', true)
-                .addField('Watch Ilegal', `comming soon`, true)
                 .setImage(posterHref)
-            await interaction.editReply({ content: title, ephermal: true });
-            return interaction.channel.send({ embeds: [embed] });
+                interaction.channel.send({ embeds: [embed] });
+                message.delete();
+            }).catch(err => {
+                console.log('error react')
+                console.log(err);
+            });
+
+            return message;
         }
         await interaction.reply(`tunggu ya... layanan belum siap`);
     } catch (err) {
