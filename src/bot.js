@@ -14,7 +14,7 @@ client.on("interactionCreate", async interaction => {
 });
 
 client.login(process.env.BOT_TOKEN).then(() => {
-    // client.user.setActivity('@galaparadi fix me', { type: 'WATCHING' })
+    if(process.env.MAINTAINANCE > 0) client.user.setActivity('@galaparadi fixing me', { type: 'WATCHING' });
 });
 
 app.use(require('body-parser').urlencoded({ extended: false }));
