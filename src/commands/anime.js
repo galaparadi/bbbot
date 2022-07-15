@@ -37,11 +37,16 @@ const handler = async (interaction) => {
                 for (const [key, val] of Object.entries(EMOTE_NUMBER)) {
                     if (val === selectedEmoji) index = key;
                 }
-                const { title, description, posterHref } = await animeById(animes[index - 1].id);
+                const { title, description, posterHref, episodes, premiered, airing } = await animeById(animes[index - 1].id);
                 const embed = new MessageEmbed()
                     .setColor('#209cee')
                     .setTitle(title)
                     .addField('Description', normalize(description) || 'no description')
+                    .addFields(
+                        { name: "episodes", value: episodes || 'episodes', inline: true },
+                        { name: "premiered", value: premiered || 'premiered', inline: true },
+                        { name: "airing", value: airing || "airing", inline: true },
+                    )
                     .setImage(posterHref)
                 interaction.channel.send({ embeds: [embed] });
                 message.delete();
