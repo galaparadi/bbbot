@@ -23,9 +23,13 @@ client.on("interactionCreate", async interaction => {
     commandHandler[commandName](interaction);
 });
 
-client.login(process.env.BOT_TOKEN).then(() => {
-    if(process.env.MAINTAINANCE > 0) client.user.setActivity('@galaparadi fixing me', { type: 'WATCHING' });
-});
+if (!!parseInt(process.env.NO_BBB)) {
+    console.log('not using bbb client');
+}else{
+    client.login(process.env.BOT_TOKEN).then(() => {
+        if (process.env.MAINTAINANCE > 0) client.user.setActivity('@galaparadi fixing me', { type: 'WATCHING' });
+    });
+}
 
 app.use(require('body-parser').urlencoded({ extended: false }));
 app.use(require('body-parser').json());
