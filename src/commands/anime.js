@@ -1,9 +1,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
-const { hyperlink } = require('@discordjs/builders');
+const { ActionRow, ButtonComponent } = require('@discordjs/builders');
 const { animeById, searchAnime } = require('../datasource/anime-v2');
 const normalize = require('../utils/text-ellipsis');
 const logger = require('../logger/logger');
+const { ButtonStyle, ComponentType } = require('discord-api-types/v10');
 const EMOTE_NUMBER = {
     1: '1️⃣',
     2: '2️⃣',
@@ -22,22 +23,17 @@ const handler = async (interaction) => {
             const animeMessage = animes.slice(0, 5).reduce((prev, current, index) => {
                 return `${prev}\n${EMOTE_NUMBER[index + 1]} : ${current.title}`
             }, '');
-            const message = await interaction.editReply({ content: `react with number to choose anime\n${animeMessage}` });
-            for await (const [key, val] of Object.entries(EMOTE_NUMBER)) {
-                await message.react(val);
+            
+            const row = new ActionRow();
+            for (const [key, val] of Object.entries(EMOTE_NUMBER)) {
+                row.addComponents(
+                    new ButtonComponent().setCustomId(key).setLabel(key).setStyle(ButtonStyle.Primary)
+                )
             }
-
-            const reactionFilter = (reaction, user) => {
-                return user.id === interaction.user.id;
-            };
-
-            message.awaitReactions({ filter: reactionFilter, max: 1, time: 10000, errors: ['time'] }).then(async collected => {
-                const selectedEmoji = collected.first().emoji.name;
-                let index = '0';
-                for (const [key, val] of Object.entries(EMOTE_NUMBER)) {
-                    if (val === selectedEmoji) index = key;
-                }
-                const { title, description, posterHref, episodes, premiered, airing } = await animeById(animes[index - 1].id);
+            const message = await interaction.editReply({ content: `Click the number to choose anime\n${animeMessage}`, components: [row] });
+            const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 5000 });
+            collector.on('collect', async i => {
+                const { title, description, posterHref, episodes, premiered, airing } = await animeById(animes[Number(i.customId) - 1].id);
                 const embed = new MessageEmbed()
                     .setColor('#209cee')
                     .setTitle(title)
@@ -47,13 +43,15 @@ const handler = async (interaction) => {
                         { name: "premiered", value: premiered || 'premiered', inline: true },
                         { name: "airing", value: airing || "airing", inline: true },
                     )
-                    .setImage(posterHref)
+                    .setImage(posterHref);
+
                 interaction.channel.send({ embeds: [embed] });
                 message.delete();
-            }).catch(err => {
-                console.log('error react')
-                console.log(err);
-            });
+                collector.stop();
+            })
+            collector.on('end', collected => {
+                collector.stop();
+            })
 
             return message;
         }
