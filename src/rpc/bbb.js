@@ -1,3 +1,6 @@
+const { getMember, getMembers } = require('../datasource/bbb/member');
+const { getChannel, getChannels } = require('../datasource/bbb/channel');
+
 function rpc({ client }) {
     const routerPath = '/bbb';
     const functions = {
@@ -54,8 +57,21 @@ function rpc({ client }) {
         },
         getChannels: async (args, cb) => {
             try {
+                const channels = (await getChannels({ client }))
+                    .map(channel => { return { id: channel.id, name: channel.name, type: channel.type } })
+                    .filter(channel => !['GUILD_CATEGORY'].includes(channel.type));
+                cb(null, channels);
+            } catch (error) {
+                console.log(error.message);
+                return cb({ error: error.message });
+            }
+        },
+        getChannel: async (args, cb) => {
+            try {
+                const { channelId } = args;
                 const CHANNELS = require('../enum/discord-channel');
-                cb(null, CHANNELS);
+                const channel = await getChannel({ client }, channelId);
+                cb(null, { id: channel.id, name: channel.name });
             } catch (error) {
                 console.log(error.message);
                 return cb({ error: error.message });
@@ -68,6 +84,7 @@ function rpc({ client }) {
                 const fcodes = await Feature.getFeatures({ roles, memberId });
                 cb(null, fcodes);
             } catch (error) {
+                console.log('rpc -> bbb -> getFatures')
                 console.log(error.message);
                 return cb({ error: error.message });
             }
@@ -79,11 +96,38 @@ function rpc({ client }) {
                 const fcode = await Feature.getFeature({ code, roles, memberId });
                 cb(null, fcode);
             } catch (error) {
+                console.log('rpc -> bbb -> getFeature');
                 console.log(error.message);
                 const { code, message } = error;
                 return cb({ code, message });
             }
-        }
+        },
+        addFeature: async (args, cb) => {
+            try {
+                const Feature = require('../datasource/feature');
+                const { code, roles, members } = args;
+                await Feature.addFeature({code, roles, members});
+                cb(null, { status: 1 })
+            } catch (error) {
+                console.log('rpc -> bbb -> addFeature');
+                console.log(error.message);
+                const { code, message } = error;
+                return cb({code, message});
+            }
+        },
+        updateFeature: async (args, cb) => { 
+            try {
+                const Feature = require('../datasource/feature');
+                const { code, roles, members } = args;
+                await Feature.updateFeature({code, roles, members});
+                cb(null, { status: 1 })
+            } catch (error) {
+                console.log('rpc -> bbb -> updateFeature')
+                console.log(error.message);
+                const { code, message } = error;
+                return cb({code, message});
+            }
+        },
     }
     return { routerPath, functions }
 }
