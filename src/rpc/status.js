@@ -13,6 +13,7 @@ function rpc({ client }) {
                 cb(null, membersId.includes(id) ? true : false);
             } catch (error) {
                 console.log(error.message) //TODO: add logger
+                console.log('rpc -> status -> is mebmer') //TODO: add logger
                 return cb({ error: error.message })
             }
         },
