@@ -1,5 +1,7 @@
 const axios = require('axios').default;
 const cheerio = require('cheerio');
+const http = require('http');
+const https = require('https');
 
 const extractInformation = ($anime) => {
     const information = $anime('.leftside > h2').get(1);
@@ -26,6 +28,68 @@ const searchAnime = async (query) => {
     return animeObjects
 }
 
+//TODO: change to currently airing anime
+const airingAnime = async (year) => {
+    const param = new URLSearchParams();
+    param.set('cat', '0');
+    param.set('type', '1');
+    param.set('score', '0');
+    param.set('status', '1');
+    param.set('p', '0');
+    param.set('r', '0');
+    param.set('sm', '1');
+    param.set('sd', '1');
+    param.set('sy', '2023');
+    param.set('em', '12');
+    param.set('ed', '31');
+    param.set('ey', '2023');
+    param.set('c', ['a', 'b', 'c', 'f']);
+    param.set('o', ['3', '3', '2', '1']);
+    const animeRes = await axios.get(`https://myanimelist.net/anime.php`,
+        {
+            // proxy: {
+            //     protocol: 'http',
+            //     host: '192.168.1.13',
+            //     port: '80'
+            // },
+            // httpAgent: new http.Agent({ keepAlive: true }),
+            // httpsAgent: new https.Agent({ keepAlive: true }),
+            // headers: {
+            //     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+            //     'sec-ch-ua': '"Not?A_Brand";v="8", "Chromium";v="108", "Google Chrome";v="108"',
+            //     'sec-ch-ua-mobile': "?0",
+            //     'sec-ch-ua-platform': "Windows",
+            //     'Sec-Fetch-Dest': "document",
+            //     'Sec-Fetch-Mode': "navigate",
+            //     'Sec-Fetch-Site': "none",
+            //     'Sec-Fetch-User': "?1",
+            //     'Upgrade-Insecure-Requests': "1",
+            // },
+            params: param,
+        }
+    );
+    const $anime = cheerio.load(animeRes.data);
+    const result = $anime('#content > div.js-categories-seasonal.js-block-list.list > table > tbody > tr')
+        .map(function (i, el) { return $anime(this) }).toArray().map($tr => {
+            return {
+                title: $anime("td:nth-child(2) strong", $tr).text(),
+                link: $anime("td:nth-child(2) a", $tr).attr("href"),
+                id: $anime("td:nth-child(2) a", $tr).attr("href")?.split('/')[4],
+                thumbUrl: $anime("td:nth-child(1) img", $tr).attr("data-src")
+            };
+        });
+    result.shift();
+    return result;
+    // data structure
+    // {
+    //     title: 'Madtoy Chatty',
+    //     link: 'https://myanimelist.net/anime/52463/Madtoy_Chatty',
+    //     id: '52463',
+    //     thumbUrl: 'https://cdn.myanimelist.net/r/50x70/images/anime/1292/125603.jpg?s=61095a518ca6625698deafd7092fea4c'
+    //   }
+
+}
+
 const animeById = async (id) => {
     const animeRes = await axios.get(`https://myanimelist.net/anime/${id}`);
     const $anime = cheerio.load(animeRes.data);
@@ -43,4 +107,4 @@ const animeById = async (id) => {
     return { posterHref, title, description, airing, episodes, premiered }
 }
 
-module.exports = { searchAnime, animeById }
+module.exports = { searchAnime, animeById, airingAnime }
