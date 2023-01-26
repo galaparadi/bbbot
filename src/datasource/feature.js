@@ -22,7 +22,7 @@ class FeatureError extends Error {
  */
 module.exports.getFeatures = async ({ roles = [], memberId }) => {
     if (parseInt(process.env.DEV_DB_MODE)) return FEATURES_FOR_TEST;
-
+    
     const query = roles.lengt > 0 || memberId ? { $or: [{ roles: { $in: roles } }, { members: memberId }] } : {};
     await mongoose.connect(process.env.BBB_DB, { useNewUrlParser: true, useUnifiedTopology: true });
     const codes = await FCode.find(query).lean();
