@@ -103,8 +103,10 @@ const animeById = async (id) => {
     const title = $anime('.title-name').text();
     const description = $rightMenu.find('p[itemprop="description"]').text();
     const airing = info.status;
+    const airingDay = info.broadcast?.split(' at ')[0].toLowerCase(); //broadcast should written saturday at 11:00 (JST)
+    const airingHour = info.broadcast?.split(' at ')[1].replace('(JST)','').replace(" ", "");
 
-    return { posterHref, title, description, airing, episodes, premiered }
+    return { posterHref, title, description, airing, episodes, premiered, airingDay, airingHour }
 }
 
 module.exports = { searchAnime, animeById, airingAnime }
