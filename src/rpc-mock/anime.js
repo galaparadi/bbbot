@@ -1,5 +1,6 @@
 const { airingAnime } = require('../datasource/anime-v2');
 const animeCron = require('../datasource/anime-cron');
+const logger = require('../logger/logger');
 
 function rpc({ client }) {
     const routerPath = '/anime';
@@ -30,9 +31,9 @@ function rpc({ client }) {
 
                 cb(null, animes);
             } catch (error) {
-                console.log('rpc -> anime -> getAiring');
-                console.log(error)
-                cb(error);
+                logger.error('rpc -> anime -> getAiring');
+                logger.error(error.message);
+                cb({ message: error.message });
             }
         },
         getScheduledAnime: async (args, cb) => {
@@ -53,9 +54,9 @@ function rpc({ client }) {
                 }];
                 cb(null, animes);
             } catch (error) {
-                console.log('rpc -> anime -> getScheduledAnime');
-                console.log(error);
-                cb(error);
+                logger.error('rpc -> anime -> getScheduledAnime');
+                logger.error(error.message);
+                cb({ message: error.message });
             }
         },
         addAnimeSchedule: async (args, cb) => {
@@ -63,8 +64,9 @@ function rpc({ client }) {
                 animeCron.addAnimeSchedule(args);
                 cb(null, { message: "adding schedule" });
             } catch (error) {
-                console.log(error);
-                console.log('rpc -> anime -> addScheduleAnime')
+                logger.error('rpc -> anime -> addScheduleAnime')
+                logger.error(error.message);
+                cb({ message: error.message });
             }
         },
         removeAnimeSchedule: async (args, cb) => {
@@ -73,9 +75,9 @@ function rpc({ client }) {
                 animeCron.removeAnimeSchedule(id);
                 cb(null, { message: `anime ${args.id} deleted` });
             } catch (error) {
-                console.log(error);
-                cb(error);
-                console.log('rpc -> anime -> removeAnimeSchedule');
+                logger.error('rpc -> anime -> removeAnimeSchedule');
+                logger.error(error.message);
+                cb({ message: error.message });
             }
         }
     }

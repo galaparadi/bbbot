@@ -1,12 +1,12 @@
 const { airingAnime, animeById } = require('../datasource/anime-v2');
 const animeCron = require('../datasource/anime-cron');
+const logger = require('../logger/logger');
 
 //This section below is for sending to anime message
 const channel = require('../enum/discord-channel');
 const { hyperlink } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const normalize = require('../utils/text-ellipsis');
-const logger = require('../logger/logger');
 //TODO: clean the code so the section above can be removed
 
 function rpc({ client }) {
@@ -18,18 +18,18 @@ function rpc({ client }) {
                 cb(null, animes);
             } catch (error) {
                 logger.error('rpc -> anime -> getAiring');
-                console.log(error)
-                cb(error);
+                logger.error(error.message);
+                return cb({ message: error.message });
             }
         },
         getScheduledAnime: async (args, cb) => {
             try {
                 const animes = await animeCron.getAnimeSchedules();
-                cb(null, animes);
+                return cb(null, animes);
             } catch (error) {
                 logger.error('rpc -> anime -> getScheduledAnime');
-                console.log(error);
-                cb(error);
+                logger.error(error.message);
+                return cb({ message: error.message });
             }
         },
         addAnimeSchedule: async (args, cb) => {
@@ -38,7 +38,8 @@ function rpc({ client }) {
                 cb(null, { message: "adding schedule" });
             } catch (error) {
                 logger.error('rpc -> anime -> addScheduleAnime')
-                cb(error);
+                logger.error(error.message);
+                return cb({ message: error.message });
             }
         },
         removeAnimeSchedule: async (args, cb) => {
@@ -47,7 +48,8 @@ function rpc({ client }) {
                 cb(null, { message: "anime deleted" });
             } catch (error) {
                 logger.error('rpc -> anime -> removeAnimeSchedule');
-                cb(error);
+                logger.error(error.message);
+                return cb({ message: error.message });
             }
         },
         pushNotifAnimeSchedule: async (args, cb) => {
@@ -65,15 +67,16 @@ function rpc({ client }) {
                         .addField('Watch Ilegal', `comming soon`, true)
                         .setImage(posterHref)
                     client.channels.cache.get(channel.ANIME).send({ embeds: [embed] })
-                    // res.send("done");
                     cb(null, { message: `notif from bbbot anime service. Anime Id : ${id}` });
                 } catch (error) {
                     logger.error('rpc -> anime -> pushNotifAnimeSchedule -> message');
-                    cb(error);
+                    logger.error(error.message);
+                    return cb({ message: error.message });
                 }
             } catch (error) {
                 logger.error('rpc -> anime -> pushNotifAnimeSchedule');
-                cb(error);
+                logger.error(error.message);
+                return cb({ message: error.message });
             }
         }
     }

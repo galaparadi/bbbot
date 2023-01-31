@@ -31,6 +31,7 @@ if (!!parseInt(process.env.NO_BBB)) {
     });
 }
 
+//TODO: change to TCP JSON-RPC
 app.use(require('body-parser').urlencoded({ extended: false }));
 app.use(require('body-parser').json());
 

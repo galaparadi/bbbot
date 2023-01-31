@@ -1,4 +1,5 @@
 const { getChannel } = require('../datasource/bbb/channel');
+const logger = require('../logger/logger');
 
 function rpc({ client }) {
     const routerPath = '/bot';
@@ -8,8 +9,9 @@ function rpc({ client }) {
                 const memory = require('../utils/mem-status')();
                 cb(null, memory);
             } catch (error) {
-                console.log('rpc -> bot -> getStats')
-                cb(error);
+                logger.error('rpc -> bot -> getStats')
+                logger.error(error.message)
+                cb({message: error.message});
             }
         },
         sendMessage: (args, cb) => {
@@ -18,8 +20,8 @@ function rpc({ client }) {
                 client.channels.cache.get(channel).send(message);
                 cb(null, message);
             } catch (error) {
-                console.log('rpc -> bot -> sendMessage')
-                cb(error);
+                logger.error('rpc -> bot -> sendMessage')
+                cb({message: error.message});
             }
         }
     }

@@ -1,5 +1,6 @@
 const { getMember, getMembers } = require('../datasource/bbb/member');
 const { getChannel, getChannels } = require('../datasource/bbb/channel');
+const logger = require('../logger/logger');
 
 function rpc({ client }) {
     const routerPath = '/bbb';
@@ -11,8 +12,10 @@ function rpc({ client }) {
                 let membersId = (await client.guilds.cache.at(0).members.fetch()).map(member => member.id);
                 cb(null, membersId.includes(id) ? true : false);
             } catch (error) {
-                console.log(error.message) //TODO: add logger
-                return cb({ error: error.message })
+                logger.error('rpc -> bbb -> isMember')
+                logger.error(error.message);
+                const { code, message } = error;
+                return cb({ code, message });
             }
         },
         getRoles: async (args, cb) => {
@@ -20,8 +23,10 @@ function rpc({ client }) {
                 const roles = await client.guilds.cache.at(0).roles.fetch();
                 cb(null, roles)
             } catch (error) {
-                console.log(error.message);
-                return cb({ error: error.message });
+                logger.error('rpc -> bbb -> getRoles')
+                logger.error(error.message);
+                const { code, message } = error;
+                return cb({ code, message });
             }
         },
         getRole: async (args, cb) => {
@@ -29,8 +34,10 @@ function rpc({ client }) {
                 const role = await client.guilds.cache.at(0).roles.fetch(args.id);
                 cb(null, role);
             } catch (error) {
-                console.log(error.message);
-                return cb({ error: error.message });
+                logger.error('rpc -> bbb -> getRole')
+                logger.error(error.message);
+                const { code, message } = error;
+                return cb({ code, message });
             }
         },
         getMembers: async (args, cb) => {
@@ -39,8 +46,10 @@ function rpc({ client }) {
                 const members = await getMembers({ client });
                 cb(null, members)
             } catch (error) {
-                console.log(error.message);
-                return cb({ error: error.message });
+                logger.error('rpc -> bbb -> getMembers')
+                logger.error(error.message);
+                const { code, message } = error;
+                return cb({ code, message });
             }
         },
         getMember: async (args, cb) => {
@@ -51,8 +60,10 @@ function rpc({ client }) {
                 const member = await getMember({ client }, memberId);
                 cb(null, member)
             } catch (error) {
-                console.log(error.message);
-                return cb({ error: error.message });
+                logger.error('rpc -> bbb -> getMember')
+                logger.error(error.message);
+                const { code, message } = error;
+                return cb({ code, message });
             }
         },
         getChannels: async (args, cb) => {
@@ -62,8 +73,10 @@ function rpc({ client }) {
                     .filter(channel => !['GUILD_CATEGORY'].includes(channel.type));
                 cb(null, channels);
             } catch (error) {
-                console.log(error.message);
-                return cb({ error: error.message });
+                logger.error('rpc -> bbb -> getChannels')
+                logger.error(error.message);
+                const { code, message } = error;
+                return cb({ code, message });
             }
         },
         getChannel: async (args, cb) => {
@@ -73,8 +86,10 @@ function rpc({ client }) {
                 const channel = await getChannel({ client }, channelId);
                 cb(null, { id: channel.id, name: channel.name });
             } catch (error) {
-                console.log(error.message);
-                return cb({ error: error.message });
+                logger.error('rpc -> bbb -> getChannel')
+                logger.error(error.message);
+                const { code, message } = error;
+                return cb({ code, message });
             }
         },
         getFeatures: async (args, cb) => {
@@ -84,9 +99,10 @@ function rpc({ client }) {
                 const fcodes = await Feature.getFeatures({ roles, memberId });
                 cb(null, fcodes);
             } catch (error) {
-                console.log('rpc -> bbb -> getFatures')
-                console.log(error.message);
-                return cb({ error: error.message });
+                logger.error('rpc -> bbb -> getFatures')
+                logger.error(error.message);
+                const { code, message } = error;
+                return cb({ code, message });
             }
         },
         getFeature: async (args, cb) => {
@@ -96,8 +112,8 @@ function rpc({ client }) {
                 const fcode = await Feature.getFeature({ code, roles, memberId });
                 cb(null, fcode);
             } catch (error) {
-                console.log('rpc -> bbb -> getFeature');
-                console.log(error.message);
+                logger.error('rpc -> bbb -> getFeature');
+                logger.error(error.message);
                 const { code, message } = error;
                 return cb({ code, message });
             }
@@ -109,8 +125,8 @@ function rpc({ client }) {
                 await Feature.addFeature({code, roles, members});
                 cb(null, { status: 1 })
             } catch (error) {
-                console.log('rpc -> bbb -> addFeature');
-                console.log(error.message);
+                logger.error('rpc -> bbb -> addFeature');
+                logger.error(error.message);
                 const { code, message } = error;
                 return cb({code, message});
             }
@@ -122,8 +138,8 @@ function rpc({ client }) {
                 await Feature.updateFeature({code, roles, members});
                 cb(null, { status: 1 })
             } catch (error) {
-                console.log('rpc -> bbb -> updateFeature')
-                console.log(error.message);
+                logger.error('rpc -> bbb -> updateFeature')
+                logger.error(error.message);
                 const { code, message } = error;
                 return cb({code, message});
             }
