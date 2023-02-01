@@ -1,3 +1,5 @@
+const logger = require('../logger/logger');
+
 function rpc({ client }) {
     const routerPath = '/status';
     const functions = {
@@ -6,9 +8,9 @@ function rpc({ client }) {
                 const memory = require('../utils/mem-status')();
                 cb(null, memory);
             } catch (error) {
-                console.log('rpc -> status -> getStat')
-                console.log(error.message);
-                cb({ message: error.message })
+                logger.error('rpc -> status -> getStat')
+                logger.error(error.message);
+                cb({ message: error.message });
             }
         },
         isMember: async (args, cb) => {
@@ -18,8 +20,8 @@ function rpc({ client }) {
                 let membersId = (await client.guilds.cache.at(0).members.fetch()).map(member => member.id);
                 cb(null, membersId.includes(id) ? true : false);
             } catch (error) {
-                console.log('rpc -> status -> isMember') //TODO: add logger
-                console.log(error.message) //TODO: add logger
+                logger.error('rpc -> status -> isMember');
+                logger.error(error.message);
                 return cb({ message: error.message })
             }
         },
@@ -28,8 +30,8 @@ function rpc({ client }) {
                 const roles = await client.guilds.cache.at(0).roles.fetch();
                 cb(null, roles.map(role => ({ name: role.name, id: role.id })))
             } catch (error) {
-                console.log('rpc -> status -> getRoles')
-                console.log(error.message);
+                logger.error('rpc -> status -> getRoles')
+                logger.error(error.message);
                 return cb({ message: error.message });
             }
         },
